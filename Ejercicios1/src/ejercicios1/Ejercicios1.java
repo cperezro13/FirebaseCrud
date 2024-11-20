@@ -6,7 +6,7 @@ package ejercicios1;
 
 /**
  *
- * @author crist
+ * aaaaaaa
  */
 public class Ejercicios1 {
 
