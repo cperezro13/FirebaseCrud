@@ -6,7 +6,7 @@ package ejercicios1;
 
 /**
  *
- * aaaaaaa
+ * aaaaaaaa
  */
 public class Ejercicios1 {
 
