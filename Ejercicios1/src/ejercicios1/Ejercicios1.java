@@ -6,7 +6,7 @@ package ejercicios1;
 
 /**
  *
- * aaaaaaaa
+ * Cristian P
  */
 public class Ejercicios1 {
 
