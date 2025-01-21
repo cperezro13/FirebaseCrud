@@ -20,7 +20,7 @@ public class FirebaseSaveObject {
         // Crear un nuevo objeto y guardarlo
         Item item = new Item();
         item.setId(100L);
-        item.setName("PruebaCrud");
+        item.setName("ItemTest");
         item.setPrice(100.0);
 
         // Guardar el objeto en Firebase
@@ -31,9 +31,9 @@ public class FirebaseSaveObject {
         System.out.println("Leyendo los datos del nodo 'item'...");
         firebaseSaveObject.readAll("item");
 
-        // Eliminar los datos del nodo "item"
-        //System.out.println("Eliminando los datos del nodo 'item'...");
-        //firebaseSaveObject.delete("item");
+        //Eliminar los datos del nodo "item"
+        System.out.println("Eliminando los datos del nodo 'item'...");
+        firebaseSaveObject.delete("item");
 
     }
 
@@ -93,36 +93,6 @@ public class FirebaseSaveObject {
         }
     }
 
-    private void recover() {
-        initFirebase();
-
-        if (firebaseDatabase == null) {
-            System.err.println("Error: firebaseDatabase sigue siendo null después de inicializar.");
-            return;
-        }
-
-        DatabaseReference databaseReference = firebaseDatabase.getReference("item");
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Item value = dataSnapshot.getValue(Item.class);
-                if (value != null) {
-                    System.out.println("Objeto recuperado:");
-                    System.out.println("ID: " + value.getId());
-                    System.out.println("Nombre: " + value.getName());
-                    System.out.println("Precio: " + value.getPrice());
-                } else {
-                    System.out.println("No se encontro ningun objeto en la base de datos.");
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                System.err.println("Error al recuperar datos: " + error.getMessage());
-            }
-        });
-    }
-
     private void delete(String key) {
         initFirebase();
 
@@ -163,7 +133,7 @@ public class FirebaseSaveObject {
                 if (dataSnapshot.exists()) {
                     System.out.println("Datos encontrados en el nodo: " + key);
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        System.out.println(snapshot.getKey() + " = " + snapshot.getValue());
+                        System.out.println(snapshot.getKey() + " : " + snapshot.getValue());
                     }
                 } else {
                     System.out.println("No hay datos en el nodo: " + key);
