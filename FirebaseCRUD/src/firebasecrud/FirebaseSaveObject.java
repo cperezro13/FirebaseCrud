@@ -32,8 +32,8 @@ public class FirebaseSaveObject {
         firebaseSaveObject.readAll("item");
 
         //Eliminar los datos del nodo "item"
-        System.out.println("Eliminando los datos del nodo 'item'...");
-        firebaseSaveObject.delete("item");
+//        System.out.println("Eliminando los datos del nodo 'item'...");
+//        firebaseSaveObject.delete("item");
 
     }
 
