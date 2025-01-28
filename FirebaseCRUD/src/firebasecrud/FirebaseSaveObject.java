@@ -7,40 +7,70 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
+import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 
 public class FirebaseSaveObject {
 
     public static void main(String[] args) throws FileNotFoundException {
         FirebaseSaveObject firebaseSaveObject = new FirebaseSaveObject();
-        // Crear un nuevo objeto y guardarlo
-        Item item = new Item();
-        item.setId(100L);
-        item.setName("ItemTest");
-        item.setPrice(100.0);
+        Scanner scanner = new Scanner(System.in);
+        boolean salir = false;
 
-        // Guardar el objeto en Firebase
-        System.out.println("Guardando el objeto en Firebase...");
-        firebaseSaveObject.save(item);
+        while (!salir) {
+            System.out.println("\nSelecciona una operacion:");
+            System.out.println("1. Guardar un objeto");
+            System.out.println("2. Leer todos los datos");
+            System.out.println("3. Eliminar datos");
+            System.out.println("4. Salir");
+            System.out.print("Tu eleccion: ");
+            
+            int opcion = scanner.nextInt();
+            scanner.nextLine(); // Limpiar el buffer del scanner
 
-        // Leer todos los datos del nodo "item" (verificar que se guardó)
-        System.out.println("Leyendo los datos del nodo 'item'...");
-        firebaseSaveObject.readAll("item");
-
-        //Eliminar los datos del nodo "item"
-//        System.out.println("Eliminando los datos del nodo 'item'...");
-//        firebaseSaveObject.delete("item");
-
+            switch (opcion) {
+                case 1:
+                    Item newItem = new Item();
+                    System.out.print("Ingresa el ID del item: ");
+                    newItem.setId(scanner.nextLong());
+                    scanner.nextLine(); // Limpiar el buffer
+                    System.out.print("Ingresa el nombre del item: ");
+                    newItem.setName(scanner.nextLine());
+                    System.out.print("Ingresa el precio del item: ");
+                    newItem.setPrice(scanner.nextDouble());
+                    scanner.nextLine(); // Limpiar el buffer
+                    System.out.println("Guardando el objeto en Firebase...");
+                    firebaseSaveObject.save(newItem);
+                    break;
+                case 2:
+                    System.out.print("Ingresa el nodo que deseas leer: ");
+                    String readKey = scanner.nextLine();
+                    firebaseSaveObject.readAll(readKey);
+                    break;
+                case 3:
+                    System.out.print("Ingresa el nodo que deseas eliminar: ");
+                    String deleteKey = scanner.nextLine();
+                    firebaseSaveObject.delete(deleteKey);
+                    break;
+                case 4:
+                    System.out.println("Saliendo del programa...");
+                    salir = true;
+                    break;
+                default:
+                    System.out.println("Opción inválida. Por favor, intenta de nuevo.");
+            }
+        }
+        scanner.close();
     }
 
     private FirebaseDatabase firebaseDatabase;
 
     /**
-     * inicialización de firebase.
+     * Inicialización de Firebase.
      */
     private void initFirebase() {
         try {
@@ -63,9 +93,9 @@ public class FirebaseSaveObject {
     }
 
     /**
-     * Save item object in Firebase.
+     * Guarda un objeto Item en Firebase.
      *
-     * @param item
+     * @param item El objeto a guardar.
      */
     private void save(Item item) throws FileNotFoundException {
         if (item != null) {
@@ -76,16 +106,15 @@ public class FirebaseSaveObject {
             DatabaseReference childReference = databaseReference.child("item");
 
             CountDownLatch countDownLatch = new CountDownLatch(1);
-            childReference.setValue(item, new DatabaseReference.CompletionListener() {
-
-                @Override
-                public void onComplete(DatabaseError de, DatabaseReference dr) {
-                    System.out.println("Registro guardado!");
-                    countDownLatch.countDown();
+            childReference.setValue(item, (de, dr) -> {
+                if (de == null) {
+                    System.out.println("Registro guardado correctamente!");
+                } else {
+                    System.err.println("Error al guardar el registro: " + de.getMessage());
                 }
+                countDownLatch.countDown();
             });
             try {
-
                 countDownLatch.await();
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
@@ -101,17 +130,13 @@ public class FirebaseSaveObject {
             return;
         }
 
-
         DatabaseReference databaseReference = firebaseDatabase.getReference(key);
 
-        databaseReference.removeValue(new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError error, DatabaseReference ref) {
-                if (error == null) {
-                    System.out.println("Datos eliminados correctamente del nodo: " + key);
-                } else {
-                    System.err.println("Error al eliminar datos: " + error.getMessage());
-                }
+        databaseReference.removeValue((error, ref) -> {
+            if (error == null) {
+                System.out.println("Datos eliminados correctamente del nodo: " + key);
+            } else {
+                System.err.println("Error al eliminar datos: " + error.getMessage());
             }
         });
     }
@@ -123,7 +148,6 @@ public class FirebaseSaveObject {
             System.err.println("Error: firebaseDatabase sigue siendo null después de inicializar.");
             return;
         }
-
 
         DatabaseReference databaseReference = firebaseDatabase.getReference(key);
 
@@ -146,6 +170,4 @@ public class FirebaseSaveObject {
             }
         });
     }
-
-
 }
